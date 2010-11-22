@@ -1,0 +1,17 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  player_type: MyString
+  total_games: 1
+  total_games_won: 1
+  total_games_lost: 1
+  total_games_tied: 1
+
+two:
+  name: MyString
+  player_type: MyString
+  total_games: 1
+  total_games_won: 1
+  total_games_lost: 1
+  total_games_tied: 1

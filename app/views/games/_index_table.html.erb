@@ -1,0 +1,31 @@
+<table>
+  <tr>
+    <th>Title</th>
+    <th>X player</th>
+    <th>O player</th>
+    <th>Winner</th>
+    <th>Last move</th>
+    <th>Num moves</th>
+    <th>Positions</th>
+    <th>Is tie game</th>
+  </tr>
+
+<% @games.each do |game| %>
+  <tr>
+    <td><%= game.title %></td>
+    <td><%= game.x_player_id %></td>
+    <td><%= game.o_player_id %></td>
+    <td><%= game.winner_id %></td>
+    <td><%= Player.find_by_id(game.last_move_id).name %></td>
+    <td><%= game.num_moves %></td>
+    <td><%= game.positions %></td>
+
+    <td><%= game.is_tie_game %></td>
+    <td><%= link_to 'Show', game %></td>
+    <td><%= link_to 'Edit', edit_game_path(game) %></td>
+    <td><%= link_to 'Destroy', game, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />

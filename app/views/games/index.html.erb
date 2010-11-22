@@ -1,0 +1,17 @@
+<h1>Reddit's Tic Tac Toe</h1>
+
+<%if true%>
+<%= render "index_table"%>
+<% end %>
+
+<div class="new">
+<% form_for Game.new do |f| %>
+	<%= f.submit "New Game" %>
+<% end %>
+</div>
+
+
+<br>
+<%= #link_to 'New Game', new_game_path 
+%>
+</br>

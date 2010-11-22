@@ -1,0 +1,55 @@
+
+<div class="page" >
+	<div class="header" >
+		<h1>Reddit's Tic-Tac-Toe</h1>
+	</div>
+	<div class="main" >
+
+		<div class="left_sidebar" >	
+			<% player = Player.find_by_id(@game.x_player)%>
+			<strong><%= player.name%><br/>X</strong><div class="stats"><br/>Wins: <%=player.total_games_won%><br/>Ties: <%=player.total_games_tied%><br/>Losses: <%=player.total_games_lost%></div>
+		</div>
+		<div class="content" >
+			<div class="game" >
+				<table>
+					<tbody>
+						<%= render "grid" %>
+
+					</tbody>
+				</table>
+				<%if ((@game.num_moves)%2 ==1) and @game.num_moves < 9 %>
+					<%= link_to "Get Ai Move", {:ai => 1, :method => :show}, :class=>"ai_move" %>
+				<% end %>
+			</div>
+		</div>
+		<div class="right_sidebar" >
+			<strong class="name">Computer<br/>O</strong><div class="stats"><br/>Games Played: <%=Game.find(:all).count%></div>
+
+		</div>
+		
+
+	</div>
+	<div id="game-notice">
+		<p id="notice"><%= notice %></p>
+	</div>
+	<div class="footer" >
+
+	</div>
+	
+	
+	<div class="new">
+	<% form_for Game.new do |f| %>
+		<%= f.submit "New Game" %>
+	<% end %>
+	</div>
+	
+	<% if false %>
+	<%= render "game_data" %>
+	<% end %>
+
+
+	<%= link_to 'Home', games_path %>
+	
+</div>
+
+

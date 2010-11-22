@@ -1,0 +1,56 @@
+<p>
+	<b>Title:</b>
+	<%= @game.title %>
+</p>
+
+<p>
+	<b>X player:</b>
+	<%= @game.x_player_id %>
+</p>
+
+<p>
+	<b>O player:</b>
+	<%= @game.o_player_id %>
+</p>
+
+<p>
+	<b>Positions:</b>
+	<% (0..@game.gamesize-1).each do |i| %>
+	<%= i %>
+	<%= @game.positions[i] %>
+</br>
+<% end %>
+</p>
+
+<p>
+	<b>Winner:</b>
+	<%= @game.winner_id %>
+</p>
+
+<p>
+	<b>Last move:</b>
+	<%= Player.find_by_id(@game.last_move_id).name %>
+</p>
+
+<p>
+	<b>Num moves:</b>
+	<%= @game.num_moves %>
+</p>
+
+<p>
+	<b>Positions:</b>
+	<%= @game.positions %>
+</p>
+
+<p>
+	<b>Gamesize:</b>
+	<%= @game.gamesize %>
+</p>
+
+<p>
+	<b>Is tie game:</b>
+	<%= @game.is_tie_game %>
+</p>
+
+
+<%= link_to 'Edit', edit_game_path(@game) %> |

@@ -1,0 +1,22 @@
+<% p = 0%>
+<% dim = @game.gamesize**0.5%>
+<% (0..dim-1).each do |row| %>
+	<%= content_tag :tr, :class => "game_row" do -%>
+		<% (0..dim-1).each do |col| %>
+			<%= content_tag :td, :id => "position_".concat(p.to_s), :class=> "game_grid" do -%>
+				<% if @game.positions[p] > 0 then %>
+						<% if @game.positions[p] == 1 then%>
+							<strong class="game_piece">X</strong>
+						<% elsif @game.positions[p] == 2 then %>
+							<strong class="game_piece">O</strong>
+						<% else%>
+							<strong class="game_piece"> </strong>
+						<% end %>
+					<% else %>
+						<strong class="game_piece" id="link"> <%= link_to "X", {:position => p, :method => :show}, :class=>"game_piece"  %></strong>
+					<% end %>
+			<% end -%>
+			<% p+=1 %>	
+		<% end%>
+	<% end -%> 
+<% end %>

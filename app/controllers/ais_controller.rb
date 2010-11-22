@@ -1,0 +1,2 @@
+class AisController < ApplicationController
+end

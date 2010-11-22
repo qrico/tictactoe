@@ -1,0 +1,21 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  title: MyString
+  x_player_id: 1
+  o_player_id: 1
+  winner_id: 1
+  last_move_id: 1
+  num_moves: 1
+  positions: 1
+  is_tie_game: false
+
+two:
+  title: MyString
+  x_player_id: 1
+  o_player_id: 1
+  winner_id: 1
+  last_move_id: 1
+  num_moves: 1
+  positions: 1
+  is_tie_game: false
