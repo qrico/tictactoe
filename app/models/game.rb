@@ -14,6 +14,7 @@ class Game < ActiveRecord::Base
 
   attr_reader :play_status
 
+  # This Class has been tested extensively as it is the heart of the model
 
   # This Class method returns a new Game object with the associated players X and O
   def self.new_game(x_player, o_player)
@@ -21,18 +22,21 @@ class Game < ActiveRecord::Base
     g = Game.new(:title => "#{x_player.name} vs. #{o_player.name}")
     g.x_player = x_player
     g.o_player = o_player
-    size = 9
+    size = 9 # Game is a default square tic tac toe game, but can be larger or smaller. Game model supports this. 
     g.gamesize = size
     g.positions = Array.new(size, 0) #empty position is 0. positions 0-8
     g.num_moves = 0
     g.last_move = o_player
-    ai = Ai.new
+    ai = Ai.new(:name => "Basic AI") #Uncomment to make default AI
+    #ai = Random_Ai.new(:name => "Basic AI") #Random is now the default
     ai.init
     ai.save
+    g.ai = ai
     g.save
     return g
   end
   
+  #initializes and starts the game
   def start(x_player,o_player)
     g = self
     g.title = "#{x_player.name} vs. #{o_player.name}"
@@ -43,15 +47,17 @@ class Game < ActiveRecord::Base
     g.positions = Array.new(size, 0) #empty position is 0. positions 0-8 
     g.num_moves = 0
     g.last_move = o_player
-    ai = Ai.new
+    ai = Ai.new(:name => "Basic AI") #Uncomment to make default AI
+    #ai = Random_Ai.new(:name => "Basic AI")
     ai.init
     ai.save
+    g.ai = ai
     g.save
  
     return g
   end
 
-  # Returns true if the game has been won or equalized
+  # Returns true if the game has been tied or won by a player
   def game_over?
     if tie_game? or game_won?
       return true
@@ -60,7 +66,7 @@ class Game < ActiveRecord::Base
     end
   end
 
-  # Returns true if the game has been equalized
+  # Returns true when it is a tied game
   def tie_game?
     if self.num_moves == gamesize and not game_won?
       if !self.is_tie_game
@@ -75,24 +81,22 @@ class Game < ActiveRecord::Base
     end
   end
 
-  # adds new move if legal (cant go out of turn, cant place in a take spot)
+  # Adds new move if it can be legally placed in the given position (cant go out of turn, cant place in a take spot, cant place when game is over)
   def add_move(player, position)
-    if not players_turn?(player)
+    if not players_turn?(player) #check 
+      #self.errors.add("It is not your turn", "") 
       return #break and return error messages
     end
     if game_won?
+      #self.errors.add("The game is already over", "")
       return #break and return error messages
     end
     if tie_game?
+      self.errors.add("The game is already over", "")
       return #break and return error messages
     end
 
-    # new move object, for records. Not using database object heavily though
-    #move = Move.new(:title => "Move to position #{position}")
-    #move.player = player
-    #move.position = position
-
-    #check if available
+    #check if position is open (available)
     if move_available?(position)
       if player == x_player
         self.positions[position] = 1
@@ -102,7 +106,7 @@ class Game < ActiveRecord::Base
       self.last_move = player
       self.num_moves += 1
     else
-      self.errors.add("move has already been taken", "")
+      self.errors.add("That move has already been taken", "")
     end 
   end
 
@@ -110,10 +114,11 @@ class Game < ActiveRecord::Base
     return self.positions[position] == 0
   end
 
+  # Returns true if it is the given player's turn
   def players_turn?(player)
     #game already over
     if not winner.nil? then
-      self.errors.add("move not allowed, game is already over.", "")
+      self.errors.add("That move not allowed, game is already over.", "")
       return false
 
       #player's turn?
@@ -137,14 +142,13 @@ class Game < ActiveRecord::Base
       else 
         check = 2
       end
-      h = check_horizontal(check)
-      v = check_vertical(check)
-      d = check_diagonal(check)
+      h = check_horizontal(check) #checks for horizontal wins
+      v = check_vertical(check) #checks for vertical wins
+      d = check_diagonal(check) #checks for diagonal wins
       if h or (v or d)
-        if self.winner.nil?
+        if self.winner.nil? # Only set winner once. Prevents totals being added more than once.
           self.winner = last_move
           if self.winner == o_player
-            puts x_player
             x_player.total_games_lost += 1
           else
             x_player.total_games_won += 1
@@ -161,6 +165,7 @@ class Game < ActiveRecord::Base
     return false
   end
 
+  # Returns true if there is a horizontal win for the player being checked
   def check_horizontal(check) #check only the last players move
     n = (self.gamesize**0.5)  #n x n game
     win = false
@@ -168,17 +173,18 @@ class Game < ActiveRecord::Base
       row = true
       (0..(n-1)).each do |j| #every colomun
         if self.positions[i*n+j] != check 
-          row = false
+          row = false #if one of the positions does not belong to the player, false is set, and loop broken to save time
           break
         end
       end
       if row
-        return true
+        return true #if the whole row has stayed true, there is a win
       end
     end
     return win
   end
 
+  # Returns true if there is a vertical win for the player being checked
   def check_vertical(check)
     n = (self.gamesize**0.5)  #n x n game
     win = false
@@ -197,17 +203,20 @@ class Game < ActiveRecord::Base
     return win
   end
 
+  # Returns true if there is a diagonal win for the player being checked
   def check_diagonal(check)
     n = Integer(self.gamesize**0.5) #n x n game
     win = false
-    #pos slope, neg slope, corner to corner
+    #c hecks pos slope, neg slope diagonals, from corner to corner
     pos = true
     neg = true
+    #check the negative slope
     (0..(n-1)).each do |i| 
       if self.positions[i*n+i] != check
         neg = false
       end
     end
+    #check the positive slope
     (0..(n-1)).each do |i|
       if self.positions[i*n+(n-1-i)] != check
         pos = false
@@ -218,16 +227,21 @@ class Game < ActiveRecord::Base
 
   end
 
-  def get_ai_move(position)
-    return self.ai.get_move(position)
-  end
-  def get_ai_move
-    return Ai.new.get_move(self.positions)
-    #return self.ai.get_move(self.positions) TODO figure out why ai wont save to the database
+  # Returns this AI's next move, based on the game state
+  def get_ai_move(positions)
+    return self.ai.get_move(positions)
   end
   
+  # Returns this game's AI's next move, based on the game state
+  def get_ai_move
+    return Ai.new.get_move(self.positions)
+    #return self.ai.get_move(self.positions) 
+  end
+  
+  # Returns this game's AI's next move, based on the game state
   def get_ai_canned_message(num_moves)
-    return Ai.new.get_canned_message(num_moves)
+    return self.ai.get_canned_message(num_moves)
+    #return Ai.new.get_canned_message(num_moves)
   end
 
 

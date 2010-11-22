@@ -7,7 +7,7 @@ class Player < ActiveRecord::Base
   ##validates_numericality_of :total_games_lost, :only_integer => true
   ##validates_numericality_of :total_games_tied, :only_integer => true 
 	
-	has_many :games, :foreign_key => 'player_x_id', :class_name => 'Game'
+	has_many :games, :foreign_key => 'x_player_id', :class_name => 'Game'
 	
 
   def new

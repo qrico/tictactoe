@@ -13,6 +13,7 @@
 ActiveRecord::Schema.define(:version => 20101122004333) do
 
   create_table "ais", :force => true do |t|
+    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

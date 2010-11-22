@@ -12,52 +12,58 @@ class GamesController < ApplicationController
 
   # GET /games/1
   # GET /games/1.xml
+  # handles the game page
   def show
+    
     @game = Game.find(params[:id])
     #place_piece
-    @pos = params[:position]
-    @ai = params[:ai]
+    @pos = params[:position] #tr position as correlated to the game board
+    @ai = params[:ai] # handle to signal the game to have the AI add a piece
+    
+    # update game model when its X_players turn
     if !@pos.nil? and (@game.last_move == @game.o_player) then
       @pos = @pos.to_i
       #@player = Player.find_by_id(@game.x_player_id).name
       player = Player.find_by_id(@game.x_player_id)
       @game.add_move(player, @pos)
       @game.save
-    end
-    if (@ai == '1') and (@game.last_move == @game.x_player) then #ai_move
+    # update game model when its O players turn
+    elsif (@ai == '1') and (@game.last_move == @game.x_player) then #ai_move
       pos = @game.get_ai_move
       player = Player.find_by_id(@game.o_player_id)
       @game.add_move(player, pos)
       @game.save
     end
     
-    #check game over
+    #check to see if the game over and push end game messages for victory, defeat, and a tie game. 
     if @game.game_over?
       if @game.is_tie_game?
-        flash[:notice] = "AI: "<<"I almost had you. There will be a victor next time!      TIE GAME"
+        flash[:notice] = "Basic AI: "<<"I almost had you. There will be a victor next time!      TIE GAME"
       elsif @game.game_won?
         if @game.winner == @game.x_player
-          flash[:notice] = "AI: "<<"GG. I shall have to reformulate my strategy.     GAME OVER"
+          flash[:notice] = "Basic AI: "<<"GG. I shall have to reformulate my strategy.     GAME OVER"
         else
-          flash[:notice] = "AI: "<<"I am the champion my friend.   GAME OVER"
+          flash[:notice] = "Basic AI: "<<"I am the champion my friend.   GAME OVER"
         end
       end
-    #else get new message and continue
+    #get an AI message based on the new game state
     else  
       moves = @game.num_moves
       if moves >= 0 then
         flash[:notice] = "Basic AI: "<<@game.get_ai_canned_message(moves)
       end
     end
-     
+    
+    #render the updated game state
     respond_to do |format|
       format.html {}#redirect_to(@game, :notice => 'Basic AI: Welcome to my domain. My pity for you insists that you go first')}
       format.xml  { render :xml => @game }
-      #format.js
+      #format.js    #place to hook unobtrusive java script
     end
-    #render :action => 'play'
+
   end
   
+  #place holder method for javascript and jquery logic
   def place_piece
     #@game = Game.find(params[:id])
     #pos = params[:position]
@@ -65,7 +71,7 @@ class GamesController < ApplicationController
     #flash[:notice] = "Well played, but I know what I am doing"
     #respond_to do |format|
     #  format.html { render :action => "edit" } #redirect_to(games_url)
-    #  
+    #  format.js
     #end
     
     
@@ -74,6 +80,8 @@ class GamesController < ApplicationController
 
   # GET /games/new
   # GET /games/new.xml
+  
+  #creates a new game
   def new
     @game = Game.new
 
@@ -84,26 +92,26 @@ class GamesController < ApplicationController
   end
 
   # GET /games/1/edit
+  #redirects to edit game page
   def edit
     @game = Game.find(params[:id])
-    @game.add_move(@game.x_player, 0)
+
   end
 
   # POST /games
   # POST /games.xml
+  
+  #starts the new game
   def create
-    @game = Game.new(params[:id])
+    @game = Game.new(params[:id]) #creates the new game
     x = current_user
     o = Player.new(:name => "Computer")
-    @game = @game.start(x,o)
-    (0..@game.gamesize-1).each do |i|
-      @game.positions[i] = 0
-    end
+    @game = @game.start(x,o)  #starts and initializes the new game
     
     respond_to do |format|
       if @game.save
         
-        format.html { redirect_to(@game) }
+        format.html { redirect_to(@game) } #
         format.xml  { render :xml => @game, :status => :created, :location => @game }
       else
         format.html { render :action => "new" }
@@ -114,6 +122,7 @@ class GamesController < ApplicationController
 
   # PUT /games/1
   # PUT /games/1.xml
+  #updates from edit page
   def update
     @game = Game.find(params[:id])
 

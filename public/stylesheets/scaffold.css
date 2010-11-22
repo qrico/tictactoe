@@ -13,6 +13,10 @@ a.game_piece:visited {
 	color:#FFFFFF;
 	text-decoration:inherit;
 }
+a.game_piece:visited:hover {
+	color:#7F7F7F;
+	text-decoration:inherit;
+}
 
 .game_piece {
 	font-size:26pt;

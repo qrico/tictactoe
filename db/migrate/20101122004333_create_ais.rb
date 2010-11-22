@@ -1,7 +1,8 @@
 class CreateAis < ActiveRecord::Migration
   def self.up
     create_table :ais do |t|
-
+      t.string :name
+      
       t.timestamps
     end
   end

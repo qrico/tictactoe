@@ -35,7 +35,6 @@ class GameTest < ActiveSupport::TestCase
   test "new player" do
     assert_equal("human" , p.name)
     assert_equal("ai" , ai.name)
-    puts p.total_games
   end
   
   test "add moves" do
@@ -163,6 +162,8 @@ class GameTest < ActiveSupport::TestCase
   
   test "basic ai" do
     game = Game.new_game(p,ai)
+    #ai=Ai.new(:name => "ai")
+    #game.ai = ai
     game.save
     
     game.add_move(p,2)
